@@ -1,5 +1,5 @@
 <template>
-  <a-layout style="height: 100%">
+  <a-layout style="height: 100%; min-width: 1200px;">
     <a-layout-header style="height: 58px">
       <a-menu
           theme="dark"
@@ -20,8 +20,24 @@
             <router-view/>
           </a-col>
           <a-col :span="8">
-            <div class="tag-container">
-              标签
+            <div class="tag-container" style="margin-top: 102px;">
+              <a-list size="small" bordered :loading="{
+                spinning:loadingTags,
+                wrapperClassName:loadingTags?'tag-loading':''
+              }" :header="loadingTags?'':'新闻标签'" :data-source="tags" style="min-height: 100px">
+                <template #loadMore>
+                  <div
+                      v-if="showLoadingMore && !loadingTags"
+                      style="text-align: center; margin-top: 12px; margin-bottom: 8px; height: 32px; line-height: 32px;"
+                  >
+                    <a-spin v-if="loadingMore"/>
+                    <a v-else>加载更多</a>
+                  </div>
+                </template>
+                <template #renderItem="{ item }">
+                  <a-list-item>{{ item.tag }}</a-list-item>
+                </template>
+              </a-list>
             </div>
           </a-col>
         </a-row>
@@ -35,13 +51,40 @@
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
+import { getTags } from "@/api/tags";
 
 export default defineComponent({
   setup() {
+    const loadingMore = ref(false);
+    const showLoadingMore = ref(true);
+    const loadingTags = ref(false)
+    const tags = ref([])
+
+    const fetchTags = async page => {
+      const data = await getTags({
+        params: {
+          size: 10,
+          page
+        }
+      })
+      tags.value = data.items
+      showLoadingMore.value = data.has_more
+    }
+
+    onMounted(async () => {
+      loadingTags.value = true
+      await fetchTags(1)
+      loadingTags.value = false
+    })
+
     return {
+      tags,
+      loadingTags,
+      loadingMore,
+      showLoadingMore,
       selectedKeys: ref(['2']),
-    };
+    }
   },
 });
 </script>
@@ -54,5 +97,9 @@ export default defineComponent({
   .tag-container {
     background: #fff;
   }
+}
+
+.tag-loading {
+  top: 50px
 }
 </style>

@@ -5,7 +5,7 @@ import { handleToken } from "@/lib/token"
 import { message } from "ant-design-vue"
 
 const requests = axios.create({
-  baseURL: "https://127.0.0.1:5000",
+  baseURL: process.env.NODE_ENV === "production" ? "" : "http://127.0.0.1:5000",
   timeout: 30000, // request timeout
 })
 
@@ -40,7 +40,7 @@ requests.interceptors.response.use(
         } else {
           localStorage.clear()
           const next = `${document.location.pathname}${document.location.hash}`
-          router.push({path: "/login", query: {next}})
+          router.push({ path: "/login", query: { next } })
           return response
         }
       }); else return response
@@ -61,17 +61,17 @@ const handlerData = response => {
 }
 
 requests.get = async (url, config = {}) => {
-  const {data} = await requests({url, method: 'get', ...config})
+  const { data } = await requests({ url, method: 'get', ...config })
   return handlerData(data)
 }
 
 requests.post = async (url, config = {}) => {
-  const {data} = await requests({url, method: 'post', ...config})
+  const { data } = await requests({ url, method: 'post', ...config })
   return handlerData(data)
 }
 
 requests.put = async (url, config = {}) => {
-  const {data} = await requests({url, method: 'put', ...config})
+  const { data } = await requests({ url, method: 'put', ...config })
   return handlerData(data)
 }
 
