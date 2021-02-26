@@ -1,5 +1,5 @@
 <template>
-  <a-layout style="height: 100%; min-width: 1200px;">
+  <a-layout style="min-height: 100%; min-width: 1200px;">
     <a-layout-header style="height: 58px">
       <a-menu
           theme="dark"
@@ -7,9 +7,8 @@
           v-model:selectedKeys="selectedKeys"
           style="line-height: 58px"
       >
-        <a-menu-item key="1">nav 1</a-menu-item>
-        <a-menu-item key="2">nav 2</a-menu-item>
-        <a-menu-item key="3">nav 3</a-menu-item>
+        <a-menu-item key="1">Home</a-menu-item>
+        <a-menu-item key="2">About</a-menu-item>
       </a-menu>
     </a-layout-header>
 
@@ -21,17 +20,24 @@
           </a-col>
           <a-col :span="8">
             <div class="tag-container" style="margin-top: 102px;">
-              <a-list size="small" bordered :loading="{
-                spinning:loadingTags,
-                wrapperClassName:loadingTags?'tag-loading':''
-              }" :header="loadingTags?'':'新闻标签'" :data-source="tags" style="min-height: 100px">
+              <a-list
+                  bordered
+                  size="small"
+                  style="min-height: 100px"
+                  :header="loadingTags?'':'新闻标签'"
+                  :data-source="tags"
+                  :loading="{
+                    spinning:loadingTags,
+                    wrapperClassName:loadingTags?'tag-loading':''
+                  }"
+              >
                 <template #loadMore>
                   <div
                       v-if="showLoadingMore && !loadingTags"
                       style="text-align: center; margin-top: 12px; margin-bottom: 8px; height: 32px; line-height: 32px;"
                   >
                     <a-spin v-if="loadingMore"/>
-                    <a v-else>加载更多</a>
+                    <a v-else @click="onLoadMore">加载更多</a>
                   </div>
                 </template>
                 <template #renderItem="{ item }">
@@ -45,7 +51,7 @@
     </a-layout-content>
 
     <a-layout-footer style="text-align: center">
-      Ant Design ©2018 Created by Ant UED
+      ©2021 Created by Stupid Pig
     </a-layout-footer>
   </a-layout>
 </template>
@@ -61,7 +67,25 @@ export default defineComponent({
     const loadingTags = ref(false)
     const tags = ref([])
 
-    const fetchTags = async page => {
+    let page = 1
+
+    const onLoadMore = async () => {
+      loadingMore.value = true
+      page++
+      const data = await getTags({
+        params: {
+          size: 10,
+          page
+        }
+      })
+      tags.value.push(...data.items)
+      console.log(tags.value)
+      showLoadingMore.value = data.has_more
+      loadingMore.value = false
+    }
+
+    onMounted(async () => {
+      loadingTags.value = true
       const data = await getTags({
         params: {
           size: 10,
@@ -70,11 +94,6 @@ export default defineComponent({
       })
       tags.value = data.items
       showLoadingMore.value = data.has_more
-    }
-
-    onMounted(async () => {
-      loadingTags.value = true
-      await fetchTags(1)
       loadingTags.value = false
     })
 
@@ -83,7 +102,8 @@ export default defineComponent({
       loadingTags,
       loadingMore,
       showLoadingMore,
-      selectedKeys: ref(['2']),
+      onLoadMore,
+      selectedKeys: ref(['1']),
     }
   },
 });
