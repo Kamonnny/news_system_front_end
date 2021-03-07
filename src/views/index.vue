@@ -7,7 +7,7 @@
         size="large"
         :pagination="false"
         :data-source="listData"
-        style="background-color: white; padding: 0 24px"
+        style="background-color: white;"
     >
       <template #renderItem="{ item }">
         <a-list-item key="item.news_id">
@@ -23,7 +23,7 @@
           </template>
           <a-list-item-meta :description="item.content">
             <template #title>
-              <a :href="item.href">{{ item.title }}</a>
+              <a :href="`/news/${item.news_id}`">{{ item.title }}</a>
             </template>
           </a-list-item-meta>
         </a-list-item>
@@ -39,7 +39,6 @@
 import { onMounted, ref } from 'vue'
 import { AlertOutlined, MessageOutlined } from '@ant-design/icons-vue';
 import { getNews } from "@/api/news";
-
 
 export default {
   components: {

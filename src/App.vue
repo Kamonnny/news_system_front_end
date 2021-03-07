@@ -1,5 +1,5 @@
 <template>
-  <a-layout style="min-height: 100%; min-width: 1200px;">
+  <a-layout style="min-height: 100%; min-width: 1200px; background-color: white">
     <a-layout-header style="height: 58px">
       <a-menu
           theme="dark"
@@ -14,42 +14,26 @@
 
     <a-layout-content style="padding: 0 50px; margin:0 auto;">
       <div class="main-content">
-        <a-row :gutter="16">
+        <a-row :gutter="32">
           <a-col :span="16">
             <router-view/>
           </a-col>
           <a-col :span="8">
             <div class="tag-container" style="margin-top: 102px;">
-              <a-list
-                  size="small"
-                  style="min-height: 100px; padding: 8px 24px"
-                  :header="loadingTags?'':'新闻标签'"
+              <a-table
+                  :columns="columns"
                   :data-source="tags"
-                  :loading="{
-                    spinning:loadingTags,
-                    wrapperClassName:loadingTags?'tag-loading':''
-                  }"
-              >
-                <template #loadMore>
-                  <div
-                      v-if="showLoadingMore && !loadingTags"
-                      style="text-align: center; margin-top: 12px; margin-bottom: 8px; height: 32px; line-height: 32px;"
-                  >
-                    <a-spin v-if="loadingMore"/>
-                    <a v-else @click="onLoadMore">加载更多</a>
-                  </div>
-                </template>
-                <template #renderItem="{ item }">
-                  <a-list-item>{{ item.tag }}</a-list-item>
-                </template>
-              </a-list>
+                  :pagination="false"
+                  size="middle"
+                  bordered
+              />
             </div>
           </a-col>
         </a-row>
       </div>
     </a-layout-content>
 
-    <a-layout-footer style="text-align: center">
+    <a-layout-footer style="text-align: center; background-color: white">
       ©2021 Created by Stupid Pig
     </a-layout-footer>
   </a-layout>
@@ -79,7 +63,6 @@ export default defineComponent({
       })
       // 从后端拿数据
       tags.value.push(...data.items)
-      console.log(tags.value)
       // 是否显示加载，加载好了不转圈
       showLoadingMore.value = data.has_more
       loadingMore.value = false
@@ -106,6 +89,13 @@ export default defineComponent({
       showLoadingMore,
       onLoadMore,
       selectedKeys: ref(['1']),
+      columns: [
+        {
+          title: '标签',
+          dataIndex: 'tag',
+          key: 'tag_id',
+        }
+      ]
     }
   },
 });

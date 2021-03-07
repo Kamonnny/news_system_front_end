@@ -8,6 +8,11 @@ const routes = [
     component: Index
   },
   {
+    path: '/news/:newsId',
+    name: 'News',
+    component: ()=>import('@/views/News')
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('@/views/NotFound.vue'),
