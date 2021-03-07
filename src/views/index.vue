@@ -1,35 +1,38 @@
 <template>
   <p class="title">猪猪新闻</p>
 
-  <a-list
-      item-layout="vertical"
-      size="large"
-      :pagination="false"
-      :data-source="listData"
-      style="background-color: white; padding: 0 24px"
-  >
-    <template #renderItem="{ item }">
-      <a-list-item key="item.title">
-        <template #actions>
-          <spam>
-            <MessageOutlined/>
-            {{ item.comments_count }}
-          </spam>
-          <spam>
-            <AlertOutlined/>
-            {{ item.views }}
-          </spam>
-        </template>
-        <a-list-item-meta :description="item.content">
-          <template #title>
-            <a :href="item.href">{{ item.title }}</a>
+  <a-spin :spinning="spinning">
+    <a-list
+        item-layout="vertical"
+        size="large"
+        :pagination="false"
+        :data-source="listData"
+        style="background-color: white; padding: 0 24px"
+    >
+      <template #renderItem="{ item }">
+        <a-list-item key="item.news_id">
+          <template #actions>
+            <span>
+              <message-outlined/>
+              {{ item.comments_count }}
+            </span>
+            <span>
+              <alert-outlined/>
+              {{ item.views }}
+            </span>
           </template>
-        </a-list-item-meta>
-      </a-list-item>
-    </template>
-  </a-list>
+          <a-list-item-meta :description="item.content">
+            <template #title>
+              <a :href="item.href">{{ item.title }}</a>
+            </template>
+          </a-list-item-meta>
+        </a-list-item>
+      </template>
+    </a-list>
+  </a-spin>
+
   <br>
-  <a-pagination v-model:current="current" :total="50" show-less-items/>
+  <a-pagination :total="total" :defaultPageSize="5" @change="onChange"/>
 </template>
 
 <script>
@@ -45,35 +48,36 @@ export default {
   },
 
   setup() {
-    const fetchConfig = {
-      params:{
-        page: 1,
-        size: 5
-      }
-    }
+    const spinning = ref(false)
     const listData = ref([])
+    const current = ref(1)
+    const total = ref(0)
 
-    onMounted(async () => {
-      const data = await getNews(fetchConfig)
+    const fetchNews = async page => {
+      spinning.value = true
+      const data = await getNews({
+        params: {
+          page,
+          size: 5
+        }
+      })
       listData.value = data.items
-    })
+      total.value = data.total
+      spinning.value = false
+    }
 
-    const actions = [
-      {
-        type: 'MessageOutlined',
-        text: '2',
-      },
-      {
-        type: 'AlertOutlined',
-        text: '156',
-      },
-    ];
+    onMounted(async () => await fetchNews(1))
+
+    const onChange = (page) => {
+      fetchNews(page)
+    }
 
     return {
-      fetchConfig,
       listData,
-      current: 2,
-      actions,
+      current,
+      total,
+      spinning,
+      onChange
     };
   },
 };
