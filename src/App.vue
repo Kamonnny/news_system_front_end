@@ -77,12 +77,15 @@ export default defineComponent({
           page
         }
       })
+      // 从后端拿数据
       tags.value.push(...data.items)
       console.log(tags.value)
+      // 是否显示加载，加载好了不转圈
       showLoadingMore.value = data.has_more
       loadingMore.value = false
     }
 
+    // 生命周期
     onMounted(async () => {
       loadingTags.value = true
       const data = await getTags({
