@@ -21,9 +21,8 @@
           <a-col :span="8">
             <div class="tag-container" style="margin-top: 102px;">
               <a-list
-                  bordered
                   size="small"
-                  style="min-height: 100px"
+                  style="min-height: 100px; padding: 8px 24px"
                   :header="loadingTags?'':'新闻标签'"
                   :data-source="tags"
                   :loading="{
