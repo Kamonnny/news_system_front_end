@@ -60,8 +60,9 @@
 <script>
 import { watch, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { getNew, getNewsComments } from "@/api/news"
+import { getNew, getNewsComments, postNewsComments } from "@/api/news"
 import moment from 'moment'
+import { message } from "ant-design-vue";
 
 export default {
   name: "News",
@@ -81,29 +82,20 @@ export default {
     const value = ref('')
 
     const total = ref(0)
+    let newsId = route.params.newsId
 
-    const onChange = () => {
-    }
+    const onChange = async page => await fetchComment(newsId, page)
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
       if (!value.value) {
         return
       }
 
       submitting.value = true
-      setTimeout(() => {
-        submitting.value = false
-        comments.value = [
-          {
-            author: 'Han Solo',
-            avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-            content: value.value,
-            datetime: moment().fromNow(),
-          },
-          ...comments.value,
-        ];
-        value.value = ''
-      }, 1000)
+      await postNewsComments(newsId, { comment: value.value })
+      message.success("评论成功")
+      await fetchNew(newsId)
+      submitting.value = false
     }
 
     const calculationDate = date => moment(date).fromNow()
@@ -125,12 +117,15 @@ export default {
       comments.value = data.items
     }
 
-    onMounted(() => fetchNew(route.params.newsId))
+    onMounted(() => fetchNew(newsId))
 
     // 当参数更改时获取 newsId
     watch(
         () => route.params,
-        async newParams => await fetchNew(newParams.newsId)
+        async newParams => {
+          newsId = newParams.newsId
+          await fetchNew(newParams.newsId)
+        }
     )
 
     return {

@@ -14,7 +14,8 @@ import {
   Table,
   Comment,
   Form,
-  Input
+  Input,
+  Alert
 } from 'ant-design-vue'
 
 export default {
@@ -22,6 +23,6 @@ export default {
     app.use(Layout).use(Menu).use(Row).use(Col)
         .use(Result).use(Button).use(Card).use(List).use(Spin).use(Pagination)
         .use(Skeleton).use(Descriptions).use(Table).use(Comment).use(Form)
-        .use(Input)
+        .use(Input).use(Alert)
   }
 }

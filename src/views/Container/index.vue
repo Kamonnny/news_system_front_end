@@ -2,15 +2,24 @@
   <a-config-provider :locale="locale">
     <a-layout style="min-height: 100%; min-width: 1200px; background-color: white">
       <a-layout-header style="height: 58px">
-        <a-menu
-            theme="dark"
-            mode="horizontal"
-            v-model:selectedKeys="selectedKeys"
-            style="line-height: 58px"
-        >
-          <a-menu-item key="1">Home</a-menu-item>
-          <a-menu-item key="2">About</a-menu-item>
-        </a-menu>
+        <a-row :gutter="[16,0]">
+          <a-col :span="12">
+            <a-menu
+                theme="dark"
+                mode="horizontal"
+                v-model:selectedKeys="selectedKeys"
+                style="line-height: 58px"
+            >
+              <a-menu-item key="1">Home</a-menu-item>
+              <a-menu-item key="2">About</a-menu-item>
+            </a-menu>
+          </a-col>
+          <a-col :span="12">
+            <div style="text-align: right">
+              <span style="color: white">fghfgh</span>
+            </div>
+          </a-col>
+        </a-row>
       </a-layout-header>
 
       <a-layout-content style="padding: 0 50px; margin:0 auto;">

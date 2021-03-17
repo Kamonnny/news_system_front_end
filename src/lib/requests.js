@@ -4,8 +4,10 @@ import router from "@/router"
 import { handleToken } from "@/lib/token"
 import { message } from "ant-design-vue"
 
+const baseURL = process.env.NODE_ENV === "production" ? "" : "http://127.0.0.1:5000"
+
 const requests = axios.create({
-  baseURL: process.env.NODE_ENV === "production" ? "" : "http://127.0.0.1:5000",
+  baseURL: baseURL,
   timeout: 30000, // request timeout
 })
 
@@ -13,6 +15,7 @@ requests.interceptors.request.use(
     config => {
       // do something before request is sent
       config.headers.Authorization = `Bearer ${store.state.accessToken}`
+      console.log(config)
       return config
     },
     error => {
@@ -25,7 +28,7 @@ requests.interceptors.request.use(
 requests.interceptors.response.use(
     response => {
       if (response.data.code === 401) return axios({
-        url: "/api/auth",
+        url: `${baseURL}/oauth`,
         method: "put",
         data: {
           refresh_token: localStorage.getItem("refreshToken")

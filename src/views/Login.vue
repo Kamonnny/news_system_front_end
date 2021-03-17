@@ -6,8 +6,9 @@
           <h2>猪猪新闻</h2>
           <p>v1.0.0</p>
         </div>
-
-        <a-input v-model:value="form.email" placeholder="请输入邮箱" size="large"/>
+        <a-alert v-if="showErr" :message="errMsg" type="error" show-icon/>
+        <br v-if="showErr"/>
+        <a-input v-model:value="form.username" placeholder="请输入用户名" size="large" allowClear/>
         <br/>
         <br/>
         <a-input-password v-model:value="form.password" placeholder="请输入密码" size="large"/>
@@ -15,13 +16,12 @@
         <br><br><br>
         <a-row :gutter="[16,0]">
           <a-col :span="12" style="text-align: center">
-            <a-button type="primary" style="width: 80%">登录</a-button>
+            <a-button type="primary" style="width: 90%" @click="login" :loading="loading">登录</a-button>
           </a-col>
           <a-col :span="12" style="text-align: center">
-            <a-button style="width: 80%">注册</a-button>
+            <a-button style="width: 90%">注册</a-button>
           </a-col>
         </a-row>
-
 
         <div class="login-footer">
           <p>©2021 Created by Stupid Pig</p>
@@ -32,16 +32,42 @@
 </template>
 
 <script>
-import { reactive } from "vue"
+import { reactive, ref } from "vue"
+import axios from 'axios'
+import { handleToken } from "@/lib/token";
+import { useRouter } from "vue-router"
 
 export default {
   name: "Login",
   setup() {
+    const router = useRouter()
+    const baseURL = process.env.NODE_ENV === "production" ? "" : "http://127.0.0.1:5000"
+    const showErr = ref(false)
+    const loading = ref(false)
+    const errMsg = ref("")
     const form = reactive({
-      email: "",
+      username: "",
       password: ""
     })
-    return { form }
+
+    const login = async () => {
+      if (form.password === "" || form.username === "") {
+        showErr.value = true
+        errMsg.value = "用户名或者密码不能为空"
+        return
+      }
+      loading.value = true
+      const { data } = await axios.post(`${baseURL}/oauth`, form)
+      if (data.code === 200) {
+        handleToken(data.data)
+        await router.push("/main")
+      } else {
+        showErr.value = true
+        errMsg.value = data.msg
+      }
+      loading.value = false
+    }
+    return { form, showErr, loading, errMsg, login }
   }
 }
 </script>
