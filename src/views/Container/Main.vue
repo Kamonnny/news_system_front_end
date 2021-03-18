@@ -32,13 +32,15 @@
   </a-spin>
 
   <br>
-  <a-pagination :total="total" :defaultPageSize="5" @change="onChange"/>
+  <a-pagination :total="total" :defaultPageSize="5" @change="onChange" hideOnSinglePage/>
 </template>
 
 <script>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { AlertOutlined, MessageOutlined } from '@ant-design/icons-vue';
 import { getNews } from "@/api/news";
+import { useRoute } from "vue-router";
+
 
 export default {
   components: {
@@ -47,25 +49,37 @@ export default {
   },
 
   setup() {
+    const route = useRoute()
     const spinning = ref(false)
     const listData = ref([])
     const current = ref(1)
     const total = ref(0)
+    const tagId = ref(null)
 
     const fetchNews = async page => {
       spinning.value = true
-      const data = await getNews({
-        params: {
-          page,
-          size: 5
-        }
-      })
+      const params = {
+        size: 5,
+        page
+      }
+      if (tagId.value != null) {
+        params.tag_id = tagId.value
+      }
+      const data = await getNews({ params })
       listData.value = data.items
       total.value = data.total
       spinning.value = false
     }
 
     onMounted(async () => await fetchNews(1))
+
+    watch(
+        () => route.query,
+        async newQuery => {
+          tagId.value = newQuery.tagId
+          await fetchNews(1)
+        }
+    )
 
     const onChange = (page) => {
       fetchNews(page)

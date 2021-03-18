@@ -15,7 +15,6 @@ requests.interceptors.request.use(
     config => {
       // do something before request is sent
       config.headers.Authorization = `Bearer ${store.state.accessToken}`
-      console.log(config)
       return config
     },
     error => {

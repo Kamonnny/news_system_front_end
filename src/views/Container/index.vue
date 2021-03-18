@@ -15,8 +15,20 @@
             </a-menu>
           </a-col>
           <a-col :span="12">
-            <div style="text-align: right">
-              <span style="color: white">fghfgh</span>
+            <div style="text-align: right; line-height: 58px">
+              <a-dropdown v-if="isLogin">
+                <a style="color: white">
+                  {{ username }}&nbsp;<DownOutlined/>
+                </a>
+                <template #overlay>
+                  <a-menu>
+                    <a-menu-item>
+                      <a @click="logout">退出</a>
+                    </a-menu-item>
+                  </a-menu>
+                </template>
+              </a-dropdown>
+              <router-link v-else style="color: white" to="/login">登录</router-link>
             </div>
           </a-col>
         </a-row>
@@ -37,7 +49,11 @@
                     size="middle"
                     rowKey="tag_id"
                     bordered
-                />
+                >
+                  <template #tag="{record}">
+                    <a style="color: #1f1f1f" @click="$router.push(`/main?tagId=${record.tag_id}`)">{{ record.tag }}</a>
+                  </template>
+                </a-table>
               </div>
             </a-col>
           </a-row>
@@ -52,16 +68,27 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, ref } from 'vue';
-import { getTags } from "@/api/tags";
-import zhCN from 'ant-design-vue/es/locale/zh_CN';
+import zhCN from 'ant-design-vue/es/locale/zh_CN'
+import { defineComponent, onMounted, ref, computed } from 'vue'
+import { DownOutlined } from '@ant-design/icons-vue'
+import { getTags } from "@/api/tags"
+import { checkLogin } from "@/lib/token"
+import { getUsers } from "@/api/users"
+import { useStore } from 'vuex'
+
 
 export default defineComponent({
+  components: {
+    DownOutlined,
+  },
   setup() {
+    const store = useStore()
     const loadingMore = ref(false);
     const showLoadingMore = ref(true);
     const loadingTags = ref(false)
     const tags = ref([])
+
+    const isLogin = ref(checkLogin())
 
     let page = 1
 
@@ -81,19 +108,33 @@ export default defineComponent({
       loadingMore.value = false
     }
 
+    const logout = () => {
+      isLogin.value = false
+      store.commit("upAccessToken", null)
+      localStorage.clear()
+    }
+
+    const fetchUser = async () => {
+      if (!isLogin.value) return
+
+      const data = await getUsers()
+      store.commit("upUser", data)
+    }
+
     // 生命周期
     onMounted(async () => {
       loadingTags.value = true
-      const data = await getTags({
-        params: {
-          size: 10,
-          page
-        }
-      })
+      await fetchUser()
+      const params = {
+        size: 10,
+        page
+      }
+      const data = await getTags({ params })
       tags.value = data.items
       showLoadingMore.value = data.has_more
       loadingTags.value = false
     })
+
 
     return {
       tags,
@@ -101,15 +142,19 @@ export default defineComponent({
       loadingMore,
       showLoadingMore,
       onLoadMore,
+      logout,
+      isLogin,
       selectedKeys: ref(['1']),
       locale: zhCN,
+      username: computed(() => store.state.username),
       columns: [
         {
           title: '标签',
           dataIndex: 'tag',
           key: 'tag_id',
+          slots: { customRender: 'tag' }
         }
-      ]
+      ],
     }
   },
 });

@@ -59,10 +59,11 @@
 
 <script>
 import { watch, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { getNew, getNewsComments, postNewsComments } from "@/api/news"
 import moment from 'moment'
 import { message } from "ant-design-vue";
+import { checkLogin } from "@/lib/token";
 
 export default {
   name: "News",
@@ -70,6 +71,7 @@ export default {
     moment.locale('zh-cn')
 
     const route = useRoute()
+    const router = useRouter()
 
     const loading = ref(true)
     const title = ref("")
@@ -81,6 +83,8 @@ export default {
     const submitting = ref(false)
     const value = ref('')
 
+    const isLogin = ref(checkLogin())
+
     const total = ref(0)
     let newsId = route.params.newsId
 
@@ -88,6 +92,11 @@ export default {
 
     const handleSubmit = async () => {
       if (!value.value) {
+        return
+      }
+
+      if (!isLogin.value) {
+        await router.push("/login")
         return
       }
 
