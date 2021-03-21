@@ -9,8 +9,9 @@
                 mode="horizontal"
                 v-model:selectedKeys="selectedKeys"
                 style="line-height: 58px"
+                @click="clickMenu"
             >
-              <a-menu-item key="1">Home</a-menu-item>
+              <a-menu-item key="Home">Home</a-menu-item>
               <a-menu-item key="2">About</a-menu-item>
             </a-menu>
           </a-col>
@@ -135,6 +136,12 @@ export default defineComponent({
       loadingTags.value = false
     })
 
+    const clickMenu = ({ key }) => {
+      if (key === "Home") {
+        location.href = "/"
+      }
+    }
+
 
     return {
       tags,
@@ -144,8 +151,9 @@ export default defineComponent({
       onLoadMore,
       logout,
       isLogin,
-      selectedKeys: ref(['1']),
+      selectedKeys: ref(['Home']),
       locale: zhCN,
+      clickMenu,
       username: computed(() => store.state.username),
       columns: [
         {
