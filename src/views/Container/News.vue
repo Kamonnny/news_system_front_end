@@ -117,7 +117,7 @@ export default {
       content.value = data.content
       loading.value = false
       tag.value = data.tag.tag
-      date.value = data.update_time
+      date.value = data.create_time
     }
 
     const fetchComment = async (newsId, page) => {

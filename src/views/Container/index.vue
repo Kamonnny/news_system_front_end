@@ -4,16 +4,19 @@
       <a-layout-header style="height: 58px">
         <a-row :gutter="[16,0]">
           <a-col :span="12">
-            <a-menu
-                theme="dark"
-                mode="horizontal"
-                v-model:selectedKeys="selectedKeys"
-                style="line-height: 58px"
-                @click="clickMenu"
-            >
-              <a-menu-item key="Home">Home</a-menu-item>
-              <a-menu-item key="2">About</a-menu-item>
-            </a-menu>
+<!--            <a-menu-->
+<!--                theme="dark"-->
+<!--                mode="horizontal"-->
+<!--                v-model:selectedKeys="selectedKeys"-->
+<!--                style="line-height: 58px"-->
+<!--                @click="clickMenu"-->
+<!--            >-->
+<!--              <a-menu-item key="Home">Home</a-menu-item>-->
+<!--              <a-menu-item key="2">About</a-menu-item>-->
+<!--            </a-menu>-->
+            <div style="line-height: 58px; color: white; font-size: large; cursor: pointer;" @click="onHome">
+              Kamon 新闻
+            </div>
           </a-col>
           <a-col :span="12">
             <div style="text-align: right; line-height: 58px">
@@ -163,6 +166,9 @@ export default defineComponent({
           slots: { customRender: 'tag' }
         }
       ],
+      onHome:()=> {
+        location.href = '/'
+      }
     }
   },
 });
